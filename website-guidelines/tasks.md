@@ -61,9 +61,9 @@ Always mark with done when a task is done
 
 ## Phase 8: Settings & Profile
 
-- [ ] **settings-page** — User settings form
-- [ ] **profile-page** — Profile edit with name/email
-- [ ] **theme-toggle** — Light/dark mode switcher
+- [x] **settings-page** — User settings form
+- [x] **profile-page** — Profile edit with name/email
+- [x] **theme-toggle** — Light/dark mode switcher
 
 ## Phase 9: Polish
 
