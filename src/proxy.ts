@@ -1,0 +1,20 @@
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+
+import { getSessionCookie } from "better-auth/cookies";
+
+export async function proxy(request: NextRequest) {
+  const sessionCookie = getSessionCookie(request);
+
+  if (!sessionCookie) {
+    const loginUrl = new URL("/auth/v2/login", request.url);
+    loginUrl.searchParams.set("callbackUrl", request.nextUrl.pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: ["/dashboard/:path*"],
+};

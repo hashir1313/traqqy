@@ -22,7 +22,7 @@ export async function GET(_request: Request, { params }: RouteParams) {
     }
 
     const totalMilestones = project.milestones.length;
-    const completedMilestones = project.milestones.filter((m) => m.status === "completed").length;
+    const completedMilestones = project.milestones.filter((m: { status: string }) => m.status === "completed").length;
     const progress = totalMilestones > 0 ? Math.round((completedMilestones / totalMilestones) * 100) : 0;
 
     return NextResponse.json({
@@ -38,14 +38,16 @@ export async function GET(_request: Request, { params }: RouteParams) {
         name: project.user.name,
         email: project.user.email,
       },
-      milestones: project.milestones.map((m) => ({
-        id: m.id,
-        title: m.title,
-        description: m.description,
-        status: m.status,
-        position: m.position,
-      })),
-      activity: project.activityLog.map((log) => ({
+      milestones: project.milestones.map(
+        (m: { id: string; title: string; description: string | null; status: string; position: number }) => ({
+          id: m.id,
+          title: m.title,
+          description: m.description,
+          status: m.status,
+          position: m.position,
+        }),
+      ),
+      activity: project.activityLog.map((log: { id: string; type: string; description: string; createdAt: Date }) => ({
         id: log.id,
         type: log.type,
         description: log.description,
@@ -55,8 +57,8 @@ export async function GET(_request: Request, { params }: RouteParams) {
       stats: {
         total: totalMilestones,
         completed: completedMilestones,
-        pending: project.milestones.filter((m) => m.status === "pending").length,
-        inProgress: project.milestones.filter((m) => m.status === "in_progress").length,
+        pending: project.milestones.filter((m: { status: string }) => m.status === "pending").length,
+        inProgress: project.milestones.filter((m: { status: string }) => m.status === "in_progress").length,
       },
     });
   } catch (error) {

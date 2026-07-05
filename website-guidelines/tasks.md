@@ -23,10 +23,10 @@ Always mark with done when a task is done
 
 ## Phase 3: Authentication
 
-- [ ] **auth-login** — Login page with email/password form
-- [ ] **auth-register** — Registration page with form validation
-- [ ] **auth-forgot-password** — Forgot password flow
-- [ ] **auth-reset-password** — Reset password page
+- [x] **auth-login** — Login page with email/password form
+- [x] **auth-register** — Registration page with form validation
+- [x] **auth-forgot-password** — Forgot password flow
+- [x] **auth-reset-password** — Reset password page
 
 ## Phase 4: Dashboard Layout
 

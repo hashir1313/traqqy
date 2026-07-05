@@ -1,21 +1,40 @@
-import { cookies } from "next/headers";
+import { betterAuth } from "better-auth";
+import { prismaAdapter } from "better-auth/adapters/prisma";
+import { nextCookies } from "better-auth/next-js";
 
 import { prisma } from "./prisma";
 
-export async function getCurrentUser() {
-  const cookieStore = await cookies();
-  const sessionId = cookieStore.get("session")?.value;
+export const auth = betterAuth({
+  database: prismaAdapter(prisma, {
+    provider: "postgresql",
+  }),
+  emailAndPassword: {
+    enabled: true,
+    requireEmailVerification: false,
+  },
+  session: {
+    expiresIn: 60 * 60 * 24 * 7, // 7 days
+    updateAge: 60 * 60 * 24, // 1 day
+  },
+  plugins: [nextCookies()],
+});
 
-  if (!sessionId) {
+export type Session = typeof auth.$Infer.Session;
+
+export async function getCurrentUser() {
+  try {
+    const session = await auth.api.getSession({
+      headers: await import("next/headers").then((m) => m.headers()),
+    });
+
+    if (!session) {
+      return null;
+    }
+
+    return session.user;
+  } catch {
     return null;
   }
-
-  const session = await prisma.user.findUnique({
-    where: { id: sessionId },
-    select: { id: true, email: true, name: true },
-  });
-
-  return session;
 }
 
 export async function requireAuth() {
