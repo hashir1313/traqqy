@@ -68,11 +68,13 @@ export function AppearanceSettings() {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-1">
-        <Label className="font-medium text-sm">Theme Preset</Label>
-        <p className="text-muted-foreground text-xs">Choose a color preset for your dashboard.</p>
+      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+        <div className="space-y-0.5">
+          <Label className="font-medium text-sm">Theme Preset</Label>
+          <p className="text-muted-foreground text-xs">Choose a color preset for your dashboard.</p>
+        </div>
         <Select value={themePreset} onValueChange={onThemePresetChange}>
-          <SelectTrigger className="w-full sm:w-[240px]">
+          <SelectTrigger className="w-full md:w-[200px]">
             <SelectValue placeholder="Preset" />
           </SelectTrigger>
           <SelectContent>
@@ -95,11 +97,13 @@ export function AppearanceSettings() {
 
       <Separator />
 
-      <div className="space-y-1">
-        <Label className="font-medium text-sm">Font</Label>
-        <p className="text-muted-foreground text-xs">Select the font family for the dashboard.</p>
+      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+        <div className="space-y-0.5">
+          <Label className="font-medium text-sm">Font</Label>
+          <p className="text-muted-foreground text-xs">Select the font family for the dashboard.</p>
+        </div>
         <Select value={font} onValueChange={onFontChange}>
-          <SelectTrigger className="w-full sm:w-[240px]">
+          <SelectTrigger className="w-full md:w-[200px]">
             <SelectValue placeholder="Select font" />
           </SelectTrigger>
           <SelectContent>
@@ -116,9 +120,11 @@ export function AppearanceSettings() {
 
       <Separator />
 
-      <div className="space-y-2">
-        <Label className="font-medium text-sm">Theme Mode</Label>
-        <p className="text-muted-foreground text-xs">Switch between light, dark, or system theme.</p>
+      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+        <div className="space-y-0.5">
+          <Label className="font-medium text-sm">Theme Mode</Label>
+          <p className="text-muted-foreground text-xs">Switch between light, dark, or system theme.</p>
+        </div>
         <ToggleGroup spacing={0} variant="outline" type="single" value={themeMode} onValueChange={onThemeModeChange}>
           <ToggleGroupItem value="light" aria-label="Toggle light">
             Light
@@ -134,9 +140,11 @@ export function AppearanceSettings() {
 
       <Separator />
 
-      <div className="space-y-2">
-        <Label className="font-medium text-sm">Page Layout</Label>
-        <p className="text-muted-foreground text-xs">Choose how page content is positioned.</p>
+      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+        <div className="space-y-0.5">
+          <Label className="font-medium text-sm">Page Layout</Label>
+          <p className="text-muted-foreground text-xs">Choose how page content is positioned.</p>
+        </div>
         <ToggleGroup
           spacing={0}
           variant="outline"
@@ -155,9 +163,11 @@ export function AppearanceSettings() {
 
       <Separator />
 
-      <div className="space-y-2">
-        <Label className="font-medium text-sm">Navbar Behavior</Label>
-        <p className="text-muted-foreground text-xs">Control how the top navbar behaves on scroll.</p>
+      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+        <div className="space-y-0.5">
+          <Label className="font-medium text-sm">Navbar Behavior</Label>
+          <p className="text-muted-foreground text-xs">Control how the top navbar behaves on scroll.</p>
+        </div>
         <ToggleGroup
           spacing={0}
           variant="outline"
@@ -176,9 +186,11 @@ export function AppearanceSettings() {
 
       <Separator />
 
-      <div className="space-y-2">
-        <Label className="font-medium text-sm">Sidebar Style</Label>
-        <p className="text-muted-foreground text-xs">Choose the visual style of the sidebar.</p>
+      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+        <div className="space-y-0.5">
+          <Label className="font-medium text-sm">Sidebar Style</Label>
+          <p className="text-muted-foreground text-xs">Choose the visual style of the sidebar.</p>
+        </div>
         <ToggleGroup spacing={0} variant="outline" type="single" value={variant} onValueChange={onSidebarStyleChange}>
           <ToggleGroupItem value="inset" aria-label="Toggle inset">
             Inset
@@ -194,9 +206,11 @@ export function AppearanceSettings() {
 
       <Separator />
 
-      <div className="space-y-2">
-        <Label className="font-medium text-sm">Sidebar Collapse Mode</Label>
-        <p className="text-muted-foreground text-xs">Choose how the sidebar collapses on smaller screens.</p>
+      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+        <div className="space-y-0.5">
+          <Label className="font-medium text-sm">Sidebar Collapse Mode</Label>
+          <p className="text-muted-foreground text-xs">Choose how the sidebar collapses on smaller screens.</p>
+        </div>
         <ToggleGroup
           spacing={0}
           variant="outline"
@@ -215,7 +229,7 @@ export function AppearanceSettings() {
 
       <Separator />
 
-      <Button type="button" size="sm" variant="outline" onClick={resetPreferences}>
+      <Button type="button" size="sm" variant="outline" className="w-full md:w-auto" onClick={resetPreferences}>
         Restore Defaults
       </Button>
     </div>
