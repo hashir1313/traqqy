@@ -1,17 +1,17 @@
 "use client";
 
-import { AlertCircle, CheckCircle2, Clock, FolderOpen } from "lucide-react";
+import { AlertCircle, CheckCircle2, FolderOpen, TrendingUp } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface StatsCardsProps {
   totalProjects: number;
   activeProjects: number;
-  completedMilestones: number;
-  pendingMilestones: number;
+  completionRate: number;
+  inProgressMilestones: number;
 }
 
-export function StatsCards({ totalProjects, activeProjects, completedMilestones, pendingMilestones }: StatsCardsProps) {
+export function StatsCards({ totalProjects, activeProjects, completionRate, inProgressMilestones }: StatsCardsProps) {
   const stats = [
     {
       title: "Total Projects",
@@ -26,16 +26,16 @@ export function StatsCards({ totalProjects, activeProjects, completedMilestones,
       description: "In progress",
     },
     {
-      title: "Completed Milestones",
-      value: completedMilestones,
-      icon: CheckCircle2,
-      description: "All projects",
+      title: "Completion Rate",
+      value: `${completionRate}%`,
+      icon: TrendingUp,
+      description: "All milestones",
     },
     {
-      title: "Pending Milestones",
-      value: pendingMilestones,
-      icon: Clock,
-      description: "Awaiting work",
+      title: "In Progress",
+      value: inProgressMilestones,
+      icon: CheckCircle2,
+      description: "Active milestones",
     },
   ];
 
