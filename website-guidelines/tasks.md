@@ -30,17 +30,17 @@ Always mark with done when a task is done
 
 ## Phase 4: Dashboard Layout
 
-- [ ] **dashboard-shell** — Sidebar + header layout with navigation
-- [ ] **dashboard-overview** — Stats cards and recent projects
-- [ ] **dashboard-sidebar** — Navigation menu with icons
+- [x] **dashboard-shell** — Sidebar + header layout with navigation
+- [x] **dashboard-overview** — Stats cards and recent projects
+- [x] **dashboard-sidebar** — Navigation menu with icons
 
 ## Phase 5: Project Management
 
-- [ ] **project-list** — Projects table with filters and sort
-- [ ] **project-create** — Create project form with validation
-- [ ] **project-details** — Project detail view with milestones
-- [ ] **project-edit** — Edit project form
-- [ ] **project-delete** — Delete confirmation dialog
+- [x] **project-list** — Projects table with filters and sort
+- [x] **project-create** — Create project form with validation
+- [x] **project-details** — Project detail view with milestones
+- [x] **project-edit** — Edit project form
+- [x] **project-delete** — Delete confirmation dialog
 
 ## Phase 6: Milestone Management
 

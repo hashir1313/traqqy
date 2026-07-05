@@ -1,0 +1,23 @@
+import { notFound } from "next/navigation";
+
+import { prisma } from "@/lib/prisma";
+
+import { EditProjectForm } from "../../_components/edit-project-form";
+
+export default async function EditProjectPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+
+  const project = await prisma.project.findUnique({ where: { id } });
+
+  if (!project) notFound();
+
+  return (
+    <div className="mx-auto max-w-2xl space-y-6">
+      <div>
+        <h2 className="font-medium text-2xl tracking-tight">Edit Project</h2>
+        <p className="text-muted-foreground text-sm">Update project details and status.</p>
+      </div>
+      <EditProjectForm project={project} />
+    </div>
+  );
+}

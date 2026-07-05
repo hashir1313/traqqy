@@ -1,11 +1,21 @@
 import { NextResponse } from "next/server";
 
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createProjectSchema } from "@/lib/validations/project";
 
 export async function GET() {
   try {
+    const session = await auth.api.getSession({
+      headers: await import("next/headers").then((m) => m.headers()),
+    });
+
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const projects = await prisma.project.findMany({
+      where: { userId: session.user.id },
       include: {
         _count: { select: { milestones: true } },
       },
@@ -21,6 +31,14 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const session = await auth.api.getSession({
+      headers: await import("next/headers").then((m) => m.headers()),
+    });
+
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await request.json();
     const data = createProjectSchema.parse(body);
 
@@ -36,7 +54,7 @@ export async function POST(request: Request) {
       data: {
         ...data,
         slug: uniqueSlug,
-        userId: "00000000-0000-0000-0000-000000000000",
+        userId: session.user.id,
       },
     });
 
