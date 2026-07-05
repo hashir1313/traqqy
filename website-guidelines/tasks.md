@@ -44,20 +44,20 @@ Always mark with done when a task is done
 
 ## Phase 6: Milestone Management
 
-- [ ] **milestone-list** — Milestones list with status badges
-- [ ] **milestone-create** — Add milestone form
-- [ ] **milestone-edit** — Edit milestone form
-- [ ] **milestone-reorder** — Drag-and-drop reordering with DND Kit
-- [ ] **milestone-status** — Toggle milestone status (pending/in_progress/completed)
+- [x] **milestone-list** — Milestones list with status badges
+- [x] **milestone-create** — Add milestone form
+- [x] **milestone-edit** — Edit milestone form
+- [x] **milestone-reorder** — Drag-and-drop reordering with DND Kit
+- [x] **milestone-status** — Toggle milestone status (pending/in_progress/completed)
 
 ## Phase 7: Public Client Page
 
-- [ ] **public-layout** — Public page layout (no auth)
-- [ ] **public-header** — Project header with freelancer info
-- [ ] **public-progress** — Progress bar with percentage
-- [ ] **public-milestones** — Completed and remaining milestones
-- [ ] **public-timeline** — Activity timeline
-- [ ] **public-contact** — Contact button (mailto)
+- [x] **public-layout** — Public page layout (no auth)
+- [x] **public-header** — Project header with freelancer info
+- [x] **public-progress** — Progress bar with percentage
+- [x] **public-milestones** — Completed and remaining milestones
+- [x] **public-timeline** — Activity timeline
+- [x] **public-contact** — Contact button (mailto)
 
 ## Phase 8: Settings & Profile
 

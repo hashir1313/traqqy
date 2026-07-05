@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+import { MilestoneList } from "./milestones/milestone-list";
+
 interface Milestone {
   id: string;
   title: string;
@@ -42,12 +44,6 @@ const statusVariant: Record<string, "default" | "secondary" | "destructive" | "o
   draft: "secondary",
   completed: "outline",
   paused: "destructive",
-};
-
-const milestoneStatusVariant: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
-  completed: "default",
-  in_progress: "secondary",
-  pending: "outline",
 };
 
 export function ProjectDetails({ project }: { project: Project }) {
@@ -127,27 +123,8 @@ export function ProjectDetails({ project }: { project: Project }) {
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle>Milestones</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {project.milestones.length === 0 ? (
-            <p className="py-4 text-center text-muted-foreground text-sm">No milestones yet.</p>
-          ) : (
-            <div className="space-y-2">
-              {project.milestones.map((milestone) => (
-                <div key={milestone.id} className="flex items-center justify-between rounded-lg border p-3">
-                  <div>
-                    <p className="font-medium text-sm">{milestone.title}</p>
-                    {milestone.description && <p className="text-muted-foreground text-xs">{milestone.description}</p>}
-                  </div>
-                  <Badge variant={milestoneStatusVariant[milestone.status] ?? "secondary"}>
-                    {milestone.status.replace("_", " ")}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          )}
+        <CardContent className="pt-6">
+          <MilestoneList projectId={project.id} milestones={project.milestones} />
         </CardContent>
       </Card>
 
