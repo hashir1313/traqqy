@@ -67,11 +67,11 @@ Always mark with done when a task is done
 
 ## Phase 9: Polish
 
-- [ ] **loading-states** — Skeleton loaders for all pages
-- [ ] **error-states** — Error boundaries and fallbacks
-- [ ] **empty-states** — Empty state components
-- [ ] **responsive** — Mobile optimization pass
-- [ ] **animations** — Motion transitions for page changes
+- [x] **loading-states** — Skeleton loaders for all pages
+- [x] **error-states** — Error boundaries and fallbacks
+- [x] **empty-states** — Empty state components
+- [x] **responsive** — Mobile optimization pass
+- [x] **animations** — Motion transitions for page changes
 
 ---
 
