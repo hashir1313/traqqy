@@ -4,7 +4,24 @@ import { useState } from "react";
 
 import { useRouter } from "next/navigation";
 
+import {
+  closestCenter,
+  DndContext,
+  type DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { GripVertical, Trash2 } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -23,14 +40,68 @@ const formSchema = z.object({
 });
 
 interface MilestoneEntry {
+  tempId: string;
   title: string;
   description: string;
+}
+
+function SortableMilestoneRow({
+  milestone,
+  onUpdate,
+  onRemove,
+}: {
+  milestone: MilestoneEntry;
+  onUpdate: (field: "title" | "description", value: string) => void;
+  onRemove: () => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: milestone.tempId,
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} className="flex items-start gap-2 rounded-lg border p-3">
+      <button
+        className="mt-2 cursor-grab touch-none text-muted-foreground hover:text-foreground"
+        {...attributes}
+        {...listeners}
+      >
+        <GripVertical className="size-4" />
+      </button>
+      <div className="flex-1 space-y-2">
+        <Input
+          placeholder="Milestone title"
+          value={milestone.title}
+          onChange={(e) => onUpdate("title", e.target.value)}
+        />
+        <Textarea
+          placeholder="Optional description"
+          value={milestone.description}
+          onChange={(e) => onUpdate("description", e.target.value)}
+          rows={2}
+        />
+      </div>
+      <Button type="button" variant="ghost" size="icon" className="mt-0.5 shrink-0" onClick={onRemove}>
+        <Trash2 className="size-4" />
+      </Button>
+    </div>
+  );
 }
 
 export function CreateProjectForm() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [milestones, setMilestones] = useState<MilestoneEntry[]>([]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -43,15 +114,28 @@ export function CreateProjectForm() {
   });
 
   function addMilestone() {
-    setMilestones((prev) => [...prev, { title: "", description: "" }]);
+    setMilestones((prev) => [...prev, { tempId: `temp-${crypto.randomUUID()}`, title: "", description: "" }]);
   }
 
-  function removeMilestone(index: number) {
-    setMilestones((prev) => prev.filter((_, i) => i !== index));
+  function removeMilestone(tempId: string) {
+    setMilestones((prev) => prev.filter((m) => m.tempId !== tempId));
   }
 
-  function updateMilestone(index: number, field: "title" | "description", value: string) {
-    setMilestones((prev) => prev.map((m, i) => (i === index ? { ...m, [field]: value } : m)));
+  function updateMilestone(tempId: string, field: "title" | "description", value: string) {
+    setMilestones((prev) => prev.map((m) => (m.tempId === tempId ? { ...m, [field]: value } : m)));
+  }
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = milestones.findIndex((m) => m.tempId === active.id);
+    const newIndex = milestones.findIndex((m) => m.tempId === over.id);
+
+    const newItems = [...milestones];
+    const [moved] = newItems.splice(oldIndex, 1);
+    newItems.splice(newIndex, 0, moved);
+    setMilestones(newItems);
   }
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
@@ -170,36 +254,20 @@ export function CreateProjectForm() {
               </Button>
             </div>
             {milestones.length > 0 && (
-              <div className="space-y-3">
-                {milestones.map((milestone, index) => (
-                  <div key={index} className="space-y-2 rounded-lg border p-3">
-                    <div className="flex items-start gap-2">
-                      <div className="flex-1 space-y-2">
-                        <Input
-                          placeholder="Milestone title"
-                          value={milestone.title}
-                          onChange={(e) => updateMilestone(index, "title", e.target.value)}
-                        />
-                        <Textarea
-                          placeholder="Optional description"
-                          value={milestone.description}
-                          onChange={(e) => updateMilestone(index, "description", e.target.value)}
-                          rows={2}
-                        />
-                      </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="mt-0.5 shrink-0"
-                        onClick={() => removeMilestone(index)}
-                      >
-                        &times;
-                      </Button>
-                    </div>
+              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                <SortableContext items={milestones.map((m) => m.tempId)} strategy={verticalListSortingStrategy}>
+                  <div className="space-y-2">
+                    {milestones.map((milestone) => (
+                      <SortableMilestoneRow
+                        key={milestone.tempId}
+                        milestone={milestone}
+                        onUpdate={(field, value) => updateMilestone(milestone.tempId, field, value)}
+                        onRemove={() => removeMilestone(milestone.tempId)}
+                      />
+                    ))}
                   </div>
-                ))}
-              </div>
+                </SortableContext>
+              </DndContext>
             )}
           </div>
 

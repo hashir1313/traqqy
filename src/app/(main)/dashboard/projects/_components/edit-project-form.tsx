@@ -4,8 +4,24 @@ import { useState } from "react";
 
 import { useRouter } from "next/navigation";
 
+import {
+  closestCenter,
+  DndContext,
+  type DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Pencil, Trash2 } from "lucide-react";
+import { GripVertical, Pencil, Trash2 } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -34,6 +50,7 @@ interface ExistingMilestone {
 }
 
 interface NewMilestone {
+  tempId: string;
   title: string;
   description: string;
 }
@@ -52,6 +69,132 @@ interface EditProjectFormProps {
   milestones: ExistingMilestone[];
 }
 
+function SortableExistingMilestoneRow({
+  milestone,
+  isEditing,
+  editTitle,
+  editDescription,
+  onEditTitleChange,
+  onEditDescriptionChange,
+  onStartEdit,
+  onCancelEdit,
+  onSaveEdit,
+  onDelete,
+}: {
+  milestone: ExistingMilestone;
+  isEditing: boolean;
+  editTitle: string;
+  editDescription: string;
+  onEditTitleChange: (v: string) => void;
+  onEditDescriptionChange: (v: string) => void;
+  onStartEdit: () => void;
+  onCancelEdit: () => void;
+  onSaveEdit: () => void;
+  onDelete: () => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: milestone.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} className="space-y-2 rounded-lg border p-3">
+      {isEditing ? (
+        <div className="space-y-2">
+          <Input placeholder="Milestone title" value={editTitle} onChange={(e) => onEditTitleChange(e.target.value)} />
+          <Textarea
+            placeholder="Optional description"
+            value={editDescription}
+            onChange={(e) => onEditDescriptionChange(e.target.value)}
+            rows={2}
+          />
+          <div className="flex gap-2">
+            <Button type="button" size="sm" onClick={onSaveEdit}>
+              Save
+            </Button>
+            <Button type="button" size="sm" variant="ghost" onClick={onCancelEdit}>
+              Cancel
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <div className="flex items-start gap-2">
+          <button
+            className="mt-2 cursor-grab touch-none text-muted-foreground hover:text-foreground"
+            {...attributes}
+            {...listeners}
+          >
+            <GripVertical className="size-4" />
+          </button>
+          <div className="min-w-0 flex-1">
+            <p className="font-medium text-sm">{milestone.title}</p>
+            {milestone.description && <p className="mt-0.5 text-muted-foreground text-xs">{milestone.description}</p>}
+          </div>
+          <div className="flex shrink-0 gap-1">
+            <Button type="button" variant="ghost" size="icon" onClick={onStartEdit}>
+              <Pencil className="size-4" />
+            </Button>
+            <Button type="button" variant="ghost" size="icon" onClick={onDelete}>
+              <Trash2 className="size-4" />
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SortableNewMilestoneRow({
+  milestone,
+  onUpdate,
+  onRemove,
+}: {
+  milestone: NewMilestone;
+  onUpdate: (field: "title" | "description", value: string) => void;
+  onRemove: () => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: milestone.tempId,
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} className="flex items-start gap-2 rounded-lg border p-3">
+      <button
+        className="mt-2 cursor-grab touch-none text-muted-foreground hover:text-foreground"
+        {...attributes}
+        {...listeners}
+      >
+        <GripVertical className="size-4" />
+      </button>
+      <div className="flex-1 space-y-2">
+        <Input
+          placeholder="Milestone title"
+          value={milestone.title}
+          onChange={(e) => onUpdate("title", e.target.value)}
+        />
+        <Textarea
+          placeholder="Optional description"
+          value={milestone.description}
+          onChange={(e) => onUpdate("description", e.target.value)}
+          rows={2}
+        />
+      </div>
+      <Button type="button" variant="ghost" size="icon" className="mt-0.5 shrink-0" onClick={onRemove}>
+        <Trash2 className="size-4" />
+      </Button>
+    </div>
+  );
+}
+
 export function EditProjectForm({ project, milestones: initialMilestones }: EditProjectFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -62,6 +205,13 @@ export function EditProjectForm({ project, milestones: initialMilestones }: Edit
     title: "",
     description: "",
   });
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  const allMilestoneIds = [...existingMilestones.map((m) => m.id), ...newMilestones.map((m) => m.tempId)];
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -75,15 +225,15 @@ export function EditProjectForm({ project, milestones: initialMilestones }: Edit
   });
 
   function addNewMilestone() {
-    setNewMilestones((prev) => [...prev, { title: "", description: "" }]);
+    setNewMilestones((prev) => [...prev, { tempId: `temp-${crypto.randomUUID()}`, title: "", description: "" }]);
   }
 
-  function removeNewMilestone(index: number) {
-    setNewMilestones((prev) => prev.filter((_, i) => i !== index));
+  function removeNewMilestone(tempId: string) {
+    setNewMilestones((prev) => prev.filter((m) => m.tempId !== tempId));
   }
 
-  function updateNewMilestone(index: number, field: "title" | "description", value: string) {
-    setNewMilestones((prev) => prev.map((m, i) => (i === index ? { ...m, [field]: value } : m)));
+  function updateNewMilestone(tempId: string, field: "title" | "description", value: string) {
+    setNewMilestones((prev) => prev.map((m) => (m.tempId === tempId ? { ...m, [field]: value } : m)));
   }
 
   function startEditMilestone(milestone: ExistingMilestone) {
@@ -131,6 +281,43 @@ export function EditProjectForm({ project, milestones: initialMilestones }: Edit
       toast.success("Milestone deleted");
     } catch {
       toast.error("Failed to delete milestone");
+    }
+  }
+
+  async function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const activeIsExisting = existingMilestones.some((m) => m.id === active.id);
+    const overIsExisting = existingMilestones.some((m) => m.id === over.id);
+
+    if (activeIsExisting && overIsExisting) {
+      const oldIndex = existingMilestones.findIndex((m) => m.id === active.id);
+      const newIndex = existingMilestones.findIndex((m) => m.id === over.id);
+
+      const newItems = [...existingMilestones];
+      const [moved] = newItems.splice(oldIndex, 1);
+      newItems.splice(newIndex, 0, moved);
+      setExistingMilestones(newItems);
+
+      try {
+        await fetch(`/api/milestones/${active.id}/reorder`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ milestoneIds: newItems.map((m) => m.id) }),
+        });
+      } catch {
+        toast.error("Failed to reorder milestones");
+        setExistingMilestones(initialMilestones);
+      }
+    } else if (!activeIsExisting && !overIsExisting) {
+      const oldIndex = newMilestones.findIndex((m) => m.tempId === active.id);
+      const newIndex = newMilestones.findIndex((m) => m.tempId === over.id);
+
+      const newItems = [...newMilestones];
+      const [moved] = newItems.splice(oldIndex, 1);
+      newItems.splice(newIndex, 0, moved);
+      setNewMilestones(newItems);
     }
   }
 
@@ -269,96 +456,36 @@ export function EditProjectForm({ project, milestones: initialMilestones }: Edit
               </Button>
             </div>
 
-            {existingMilestones.length > 0 && (
-              <div className="space-y-2">
-                {existingMilestones.map((milestone) => (
-                  <div key={milestone.id} className="space-y-2 rounded-lg border p-3">
-                    {editingMilestoneId === milestone.id ? (
-                      <div className="space-y-2">
-                        <Input
-                          placeholder="Milestone title"
-                          value={editingMilestone.title}
-                          onChange={(e) => setEditingMilestone((prev) => ({ ...prev, title: e.target.value }))}
-                        />
-                        <Textarea
-                          placeholder="Optional description"
-                          value={editingMilestone.description}
-                          onChange={(e) => setEditingMilestone((prev) => ({ ...prev, description: e.target.value }))}
-                          rows={2}
-                        />
-                        <div className="flex gap-2">
-                          <Button type="button" size="sm" onClick={() => saveEditMilestone(milestone.id)}>
-                            Save
-                          </Button>
-                          <Button type="button" size="sm" variant="ghost" onClick={cancelEditMilestone}>
-                            Cancel
-                          </Button>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0 flex-1">
-                          <p className="font-medium text-sm">{milestone.title}</p>
-                          {milestone.description && (
-                            <p className="mt-0.5 text-muted-foreground text-xs">{milestone.description}</p>
-                          )}
-                        </div>
-                        <div className="flex shrink-0 gap-1">
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => startEditMilestone(milestone)}
-                          >
-                            <Pencil className="size-4" />
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => deleteExistingMilestone(milestone.id)}
-                          >
-                            <Trash2 className="size-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    )}
+            {(existingMilestones.length > 0 || newMilestones.length > 0) && (
+              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                <SortableContext items={allMilestoneIds} strategy={verticalListSortingStrategy}>
+                  <div className="space-y-2">
+                    {existingMilestones.map((milestone) => (
+                      <SortableExistingMilestoneRow
+                        key={milestone.id}
+                        milestone={milestone}
+                        isEditing={editingMilestoneId === milestone.id}
+                        editTitle={editingMilestone.title}
+                        editDescription={editingMilestone.description}
+                        onEditTitleChange={(v) => setEditingMilestone((prev) => ({ ...prev, title: v }))}
+                        onEditDescriptionChange={(v) => setEditingMilestone((prev) => ({ ...prev, description: v }))}
+                        onStartEdit={() => startEditMilestone(milestone)}
+                        onCancelEdit={cancelEditMilestone}
+                        onSaveEdit={() => saveEditMilestone(milestone.id)}
+                        onDelete={() => deleteExistingMilestone(milestone.id)}
+                      />
+                    ))}
+                    {newMilestones.map((milestone) => (
+                      <SortableNewMilestoneRow
+                        key={milestone.tempId}
+                        milestone={milestone}
+                        onUpdate={(field, value) => updateNewMilestone(milestone.tempId, field, value)}
+                        onRemove={() => removeNewMilestone(milestone.tempId)}
+                      />
+                    ))}
                   </div>
-                ))}
-              </div>
-            )}
-
-            {newMilestones.length > 0 && (
-              <div className="space-y-2">
-                {newMilestones.map((milestone, index) => (
-                  <div key={index} className="space-y-2 rounded-lg border p-3">
-                    <div className="flex items-start gap-2">
-                      <div className="flex-1 space-y-2">
-                        <Input
-                          placeholder="Milestone title"
-                          value={milestone.title}
-                          onChange={(e) => updateNewMilestone(index, "title", e.target.value)}
-                        />
-                        <Textarea
-                          placeholder="Optional description"
-                          value={milestone.description}
-                          onChange={(e) => updateNewMilestone(index, "description", e.target.value)}
-                          rows={2}
-                        />
-                      </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="mt-0.5 shrink-0"
-                        onClick={() => removeNewMilestone(index)}
-                      >
-                        &times;
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                </SortableContext>
+              </DndContext>
             )}
 
             {existingMilestones.length === 0 && newMilestones.length === 0 && (
