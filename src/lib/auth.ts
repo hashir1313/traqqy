@@ -27,7 +27,7 @@ export const auth = betterAuth({
     updateAge: 60 * 60 * 24, // 1 day
   },
   onAPIError: {
-    errorURL: "/auth/v2/error",
+    errorURL: "/auth/error",
   },
   plugins: [nextCookies()],
 });
