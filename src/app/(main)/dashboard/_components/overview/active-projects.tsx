@@ -35,7 +35,8 @@ export function ActiveProjects({ projects }: ActiveProjectsProps) {
       </CardHeader>
       <CardContent>
         {projects.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-8">
+          <div className="flex flex-col items-center justify-center gap-3 py-8">
+            <p className="text-muted-foreground text-sm">No active projects found.</p>
             <Button asChild>
               <Link href="/dashboard/projects/new">
                 <PlusCircleIcon className="mr-1 size-4" />
