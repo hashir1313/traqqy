@@ -174,12 +174,12 @@ export function CreateProjectForm() {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Project Details</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+    <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Project Details</CardTitle>
+        </CardHeader>
+        <CardContent>
           <FieldGroup className="gap-4">
             <Controller
               control={form.control}
@@ -245,42 +245,48 @@ export function CreateProjectForm() {
               />
             </div>
           </FieldGroup>
+        </CardContent>
+      </Card>
 
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <h3 className="font-medium text-sm">Milestones</h3>
-              <Button type="button" variant="outline" size="sm" onClick={addMilestone}>
-                Add Milestone
-              </Button>
-            </div>
-            {milestones.length > 0 && (
-              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                <SortableContext items={milestones.map((m) => m.tempId)} strategy={verticalListSortingStrategy}>
-                  <div className="space-y-2">
-                    {milestones.map((milestone) => (
-                      <SortableMilestoneRow
-                        key={milestone.tempId}
-                        milestone={milestone}
-                        onUpdate={(field, value) => updateMilestone(milestone.tempId, field, value)}
-                        onRemove={() => removeMilestone(milestone.tempId)}
-                      />
-                    ))}
-                  </div>
-                </SortableContext>
-              </DndContext>
-            )}
-          </div>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle>Milestones</CardTitle>
+          <Button type="button" variant="outline" size="sm" onClick={addMilestone}>
+            Add Milestone
+          </Button>
+        </CardHeader>
+        <CardContent>
+          {milestones.length > 0 ? (
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <SortableContext items={milestones.map((m) => m.tempId)} strategy={verticalListSortingStrategy}>
+                <div className="space-y-2">
+                  {milestones.map((milestone) => (
+                    <SortableMilestoneRow
+                      key={milestone.tempId}
+                      milestone={milestone}
+                      onUpdate={(field, value) => updateMilestone(milestone.tempId, field, value)}
+                      onRemove={() => removeMilestone(milestone.tempId)}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
+          ) : (
+            <p className="py-4 text-center text-muted-foreground text-sm">
+              No milestones yet. Add one to track progress.
+            </p>
+          )}
+        </CardContent>
+      </Card>
 
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={() => router.back()}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? "Creating..." : "Create Project"}
-            </Button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+      <div className="flex justify-end gap-2">
+        <Button type="button" variant="outline" onClick={() => router.back()}>
+          Cancel
+        </Button>
+        <Button type="submit" disabled={loading}>
+          {loading ? "Creating..." : "Create Project"}
+        </Button>
+      </div>
+    </form>
   );
 }
