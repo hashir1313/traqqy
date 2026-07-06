@@ -21,7 +21,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { GripVertical, Trash2 } from "lucide-react";
+import { GripVertical, Plus, Trash2 } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -252,6 +252,7 @@ export function CreateProjectForm() {
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Milestones</CardTitle>
           <Button type="button" variant="outline" size="sm" onClick={addMilestone}>
+            <Plus className="mr-1 size-4" />
             Add Milestone
           </Button>
         </CardHeader>

@@ -16,7 +16,7 @@ import {
   useReactTable,
   type VisibilityState,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronLeft, ChevronRight, MoreHorizontal, Plus, Trash2 } from "lucide-react";
+import { ArrowUpDown, ChevronLeft, ChevronRight, Eye, MoreHorizontal, Pencil, Plus, Trash2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -106,9 +106,11 @@ export function ProjectsTable({ initialProjects }: { initialProjects: Project[] 
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => router.push(`/dashboard/projects/${row.original.id}`)}>
+              <Eye className="mr-2 size-4" />
               View details
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => router.push(`/dashboard/projects/${row.original.id}/edit`)}>
+              <Pencil className="mr-2 size-4" />
               Edit
             </DropdownMenuItem>
             <DropdownMenuSeparator />
