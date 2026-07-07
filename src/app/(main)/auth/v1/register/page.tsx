@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+
 import Link from "next/link";
 
 import { Command } from "lucide-react";
@@ -18,7 +20,9 @@ export default function RegisterV1() {
           </div>
           <div className="space-y-4">
             <RegisterForm />
-            <GoogleButton className="w-full" variant="outline" />
+            <Suspense fallback={<div className="h-10 w-full animate-pulse rounded bg-muted" />}>
+              <GoogleButton className="w-full" variant="outline" />
+            </Suspense>
             <p className="text-center text-muted-foreground text-xs">
               Already have an account?{" "}
               <Link prefetch={false} href="login" className="text-primary">
