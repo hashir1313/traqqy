@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+
 import Link from "next/link";
 
 import { Globe } from "lucide-react";
@@ -14,7 +16,9 @@ export default function ResetPassword() {
           <h1 className="font-medium text-3xl">Reset your password</h1>
           <p className="text-muted-foreground text-sm">Enter your new password below.</p>
         </div>
-        <ResetPasswordForm />
+        <Suspense fallback={<div className="h-10 w-full animate-pulse rounded bg-muted" />}>
+          <ResetPasswordForm />
+        </Suspense>
       </div>
 
       <div className="absolute top-5 flex w-full justify-end px-10">

@@ -34,7 +34,9 @@ export default function LoginV1() {
             <Suspense fallback={<div className="h-10 w-full animate-pulse rounded bg-muted" />}>
               <LoginForm />
             </Suspense>
-            <GoogleButton className="w-full" variant="outline" />
+            <Suspense fallback={<div className="h-10 w-full animate-pulse rounded bg-muted" />}>
+              <GoogleButton className="w-full" variant="outline" />
+            </Suspense>
             <p className="text-center text-muted-foreground text-xs">
               Don&apos;t have an account?{" "}
               <Link prefetch={false} href="register" className="text-primary">
