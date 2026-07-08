@@ -3,8 +3,6 @@ import { CheckCircle2, Circle, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-import { ContactButton } from "./contact-button";
-
 interface PublicPageProps {
   project: {
     name: string;
@@ -80,16 +78,14 @@ export function PublicPage({ project, freelancer, milestones, activity, progress
         {/* Freelancer Info */}
         <Card>
           <CardContent className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              {freelancer.logoUrl ? (
-                // biome-ignore lint/performance/noImgElement: user-uploaded logo
-                <img
-                  src={freelancer.logoUrl}
-                  alt={`${freelancer.name} logo`}
-                  className="size-10 rounded-lg object-contain"
-                />
-              ) : null}
-              <div className="flex flex-row justify-between">
+            <div className="w-full flex items-center gap-3">
+              <div className="relative w-fit aspect-square overflow-hidden rounded-[50%]">
+                {freelancer.logoUrl ? (
+                  // biome-ignore lint/performance/noImgElement: user-uploaded logo
+                  <img src={freelancer.logoUrl} alt={`${freelancer.name} logo`} className="size-10 object-cover" />
+                ) : null}
+              </div>
+              <div className="flex w-full flex-row justify-between">
                 <p className="font-medium text-sm">{freelancer.name}</p>
                 <p className="text-muted-foreground text-xs">{freelancer.email}</p>
               </div>

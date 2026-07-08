@@ -128,30 +128,28 @@ export function BrandingSettings({ logoUrl: initialLogoUrl, brandColor: initialB
             Choose a color for progress bars and accents on your public pages.
           </p>
         </div>
-        <FieldGroup>
-          <div className="flex items-end gap-2">
-            <input
-              type="color"
-              value={brandColor}
-              onChange={(e) => setBrandColor(e.target.value)}
-              className="size-8 cursor-pointer rounded-md border bg-transparent p-0 [&::-webkit-color-swatch-wrapper]:p-0.5 [&::-webkit-color-swatch]:rounded-md"
-            />
-            <Input
-              value={brandColor}
-              onChange={(e) => setBrandColor(e.target.value)}
-              className="h-8 w-24 font-mono text-xs"
-              maxLength={7}
-            />
-            <Button
-              size="sm"
-              onClick={handleSaveColor}
-              disabled={saving || brandColor === initialBrandColor}
-              style={{ backgroundColor: brandColor, color: "#fff" }}
-            >
-              {saving ? "Saving..." : "Save"}
-            </Button>
-          </div>
-        </FieldGroup>
+        <div className="flex flex-row items-end gap-2">
+          <input
+            type="color"
+            value={brandColor}
+            onChange={(e) => setBrandColor(e.target.value)}
+            className="size-8 cursor-pointer rounded-md border bg-transparent p-0 [&::-webkit-color-swatch-wrapper]:p-0.5 [&::-webkit-color-swatch]:rounded-md"
+          />
+          <Input
+            value={brandColor}
+            onChange={(e) => setBrandColor(e.target.value)}
+            className="h-8 w-24 font-mono text-xs"
+            maxLength={7}
+          />
+          <Button
+            size="sm"
+            onClick={handleSaveColor}
+            disabled={saving || brandColor === initialBrandColor}
+            style={{ backgroundColor: brandColor, color: "#fff" }}
+          >
+            {saving ? "Saving..." : "Save"}
+          </Button>
+        </div>
       </div>
     </div>
   );
