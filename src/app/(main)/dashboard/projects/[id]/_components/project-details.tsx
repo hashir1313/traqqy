@@ -2,7 +2,8 @@
 
 import { useRouter } from "next/navigation";
 
-import { ArrowLeft, Pencil } from "lucide-react";
+import { ArrowLeft, ClipboardCopy, Pencil } from "lucide-react";
+import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -60,10 +61,12 @@ export function ProjectDetails({ project }: { project: Project }) {
           <Button variant="ghost" size="icon" onClick={() => router.push("/dashboard/projects")}>
             <ArrowLeft className="size-4" />
           </Button>
-          <div>
-            <h2 className="font-medium text-2xl tracking-tight">{project.name}</h2>
-            <div className="flex items-center gap-2 text-muted-foreground text-sm">
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2">
+              <h2 className="font-medium text-2xl tracking-tight">{project.name}</h2>
               <Badge variant={statusVariant[project.status] ?? "secondary"}>{project.status}</Badge>
+            </div>
+            <div className="flex items-center gap-2 text-muted-foreground text-sm">
               {project.clientName && <span>Client: {project.clientName}</span>}
             </div>
           </div>
@@ -76,7 +79,10 @@ export function ProjectDetails({ project }: { project: Project }) {
 
       {project.description && (
         <Card>
-          <CardContent className="pt-6">
+          <CardHeader>
+            <CardTitle>Description</CardTitle>
+          </CardHeader>
+          <CardContent className="">
             <p className="text-sm">{project.description}</p>
           </CardContent>
         </Card>
@@ -105,16 +111,27 @@ export function ProjectDetails({ project }: { project: Project }) {
             <p className="text-muted-foreground text-xs">completed</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="pb-2">
+        <Card className="justify-between">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-muted-foreground text-sm">Public URL</CardTitle>
+            <Button
+              variant="outline"
+              size="icon"
+              className="cursor-pointer"
+              onClick={() => {
+                navigator.clipboard.writeText(`${window.location.origin}/p/${project.slug}`);
+                toast.success("Public URL copied to clipboard");
+              }}
+            >
+              <ClipboardCopy className="size-4" />
+            </Button>
           </CardHeader>
           <CardContent>
             <a
               href={`/p/${project.slug}`}
               target="_blank"
               rel="noreferrer"
-              className="text-primary text-sm hover:underline"
+              className="text-primary text-sm hover:underline self-end"
             >
               /p/{project.slug}
             </a>
