@@ -2,8 +2,6 @@
 
 **Progress tracking for freelancers** - Share real-time project progress with clients through public milestone pages.
 
-<img src="https://github.com/hashir1313/traqqy/blob/main/media/dashboard.png?version=5" alt="Traqqy Dashboard">
-
 Traqqy helps freelancers keep clients updated on project progress without sending repetitive messages. Create projects, break them into milestones, and share a unique public page with your clients that shows real-time progress.
 
 > **Live demo:** [traqqy-eta.vercel.app](https://traqqy-eta.vercel.app)
